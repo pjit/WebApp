@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Task list</title>
+    <link rel="stylesheet" type="text/css" href="styles/tasks.css" media="screen"/>
+</head>
+<body>
+    <header>
+        <span>Task list</span>
+    </header>
+    <main id="taskPage">
+        <section id="taskCreation" class="not">
+            <form id="taskForm">
+                <input type="hidden" name="id"/>
+                <div>
+                    <label>Task</label>
+                    <input type="text" required="required" maxlength="200"
+                           name="task" class="large" placeholder="Breakfast at Tiffanys"/>
+                </div>
+                <div>
+                    <label>Required by</label>
+                    <input type="date" required="required" name="requiredBy"/>
+                </div>
+                <div>
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="Personal">Personal</option>
+                        <option value="Work">Work</option>
+                    </select>
+                </div>
+                <nav>
+                    <a href="#" id="saveTask">Save Task</a>
+                    <a href="#" id="clearTask">Clear Task</a>
+                </nav>
+            </form>
+        </section>
+        <section>
+            <table id="tblTasks">
+                <colgroup>
+                    <col width="40%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="30%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Due</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <nav>
+                <a href="#" id="btnAddTask">Add task</a>
+            </nav>
+        </section>
+    </main>
+    <footer>You have 3 tasks</footer>
+    <!-- include jquery locally and for production use cdn -->
+    <script src="libs/jquery.js"></script>
+    <script src="libs/underscore.js"></script>
+    <script src="libs/jquery.validate.js"></script>
+    <script src="scripts/jquery_serialization.js"></script>
+    <!--<script src="scripts/taskswebstorage.js"></script>-->
+    <script src="scripts/tasksindexeddb.js"></script>
+    <script src="scripts/taskscontroller.js"></script>
+    <!--
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    -->
+</body>
+    <script>
+        $(document).ready(function() {
+            taskController.init($('#taskPage'));
+            // Load all saved tasks
+            taskController.loadTasks();
+            // jquery plugin to de/serialize form fields
+            (function($) {
+                $.fn.extend({
+                   toObject: function() {
+                       var result = {};
+
+                       $.each(this.serializeArray(), function(i,v){
+                         result[v.name] = v.value;
+                       });
+
+                       return result;
+                   },
+                   fromObject : function(obj) {
+                        $.each(this.find(':input'), function(i, v) {
+                            var name = $(v).attr('name');
+
+                            if (obj[name]) {
+                                $(v).val(obj[name]);
+
+                            } else {
+                                $(v).val('');
+                            }
+                        });
+                   }
+                });
+            })(jQuery);
+        });
+    </script>
+    <!-- Template to add a row -->
+    <script id="taskRow" type="text/underscore">
+        <tr>
+            <td><%= task%></td>
+            <td><time datetime="<%= requiredBy%>"><%= requiredBy%></time></td>
+            <td><%= category%></td>
+            <td>
+                <nav>
+                    <a href="#" class="editRow" data-task-id="<%= id%>">Edit</a>
+                    <a href="#">Complete</a>
+                    <a href="#" class="deleteRow" data-task-id="<%= id%>">Delete</a>
+                </nav>
+            </td>
+        </tr>
+    </script>
+</html>
